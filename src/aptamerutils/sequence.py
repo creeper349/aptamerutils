@@ -111,6 +111,13 @@ class Sequence:
     def getkmerSet(self, kmer:int) -> set:
         return set([self[i:i + kmer] for i in range(len(self) - kmer + 1)])
     
+    def getkmerCount(self, kmer:int) -> dict:
+        counts = {}
+        for i in range(len(self) - kmer + 1):
+            part = self[i: i + kmer]
+            counts[part] = counts.get(part, 0) + 1
+        return counts
+    
     def getTmEstimation(self):
         if len(self.seq) < 14:
             a = self.seq.count('A')
@@ -160,12 +167,12 @@ class Sequence:
     def matchCustomSeqCombination(self, pattern:Find):
         return pattern.match(self.seq)
     
-    def trimTwoEnds(self, start, end, fixed_length = None):
+    def trimTwoEnds(self, start, end, fixed_length = None, fixed_length_tol = 0):
         pattern = r"%s(.*?)%s" % (re.escape(str(start)), re.escape(str(end)))
         match = re.search(pattern, self.seq)
         if match:
             target = match.group(1)
-            if (not fixed_length) or (len(target) == fixed_length):
+            if (not fixed_length) or (fixed_length - fixed_length_tol <= len(target) <= fixed_length + fixed_length_tol):
                 return Sequence(target)
         return None
     
@@ -174,6 +181,15 @@ class Sequence:
         match = re.search(pattern, self.seq)
         if match:
             return Sequence(match.group(1))
+        else:
+            return None
+        
+    def trimWithFuzzyPattern(self, pattern):
+        match = pattern.search(self.seq)
+        if match:
+            return Sequence(match.group(2))
+        else:
+            return None
     
     def distWith(self, other, dist: Literal["ed", "ncd", "kmer"] = "kmer", **kwargs):
         dist_matrics = editing_distance if dist == "ed" else ncd if dist == "ncd" else jaccard

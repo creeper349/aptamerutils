@@ -1,9 +1,11 @@
 import numpy as np
 from .sequence import Sequence
 from typing import Literal
-from sklearn.manifold import MDS
+from sklearn.manifold import MDS, TSNE
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans, DBSCAN
+from sklearn.decomposition import PCA
+from hdbscan import HDBSCAN
 from umap import UMAP
 
 class PosMap(np.ndarray):
@@ -28,12 +30,25 @@ class PosMap(np.ndarray):
         scaler = StandardScaler()
         return cls(scaler.fit_transform(umap.fit_transform(dist)))
     
-    def getCluster(self, metrics:Literal["dbscan", "kmeans"] = "dbscan", **kwargs):
+    def getCluster(self, metrics:Literal["dbscan", "kmeans", "hdbscan"] = "dbscan", **kwargs):
         if metrics == "dbscan":
             eps = kwargs.pop("eps", 0.6)
             dbscan = DBSCAN(eps, **kwargs)
             return dbscan.fit_predict(self)
-        else:
+        elif metrics == "kmeans":
             n_clusters = kwargs.pop("n_clusters", 8)
             kmeans = KMeans(n_clusters, **kwargs)
             return kmeans.fit_predict(self)
+        else:
+            hdbscan = HDBSCAN(**kwargs)
+            return hdbscan.fit_predict(self)
+        
+    def visualize(self, ax, metrics:Literal["pca", "tsne"] = "pca", **kwargs):
+        if metrics == "pca":
+            pca = PCA(n_components = 2)
+            embeddings = pca.fit_transform(self)
+        else:
+            tsne = TSNE(n_components = 2)
+            embeddings = tsne.fit_transform(self)
+        ax.scatter(embeddings[:, 0], embeddings[:, 1])
+        return ax
