@@ -1,7 +1,12 @@
 import os
 import re
 import json
+import regex
 import numpy as np
+import matplotlib
+matplotlib.use("Agg")
+
+import matplotlib.pyplot as plt
 from .sequence import Sequence
 from ._distmap import DistMatrix
 from ._textrenderer import *
@@ -126,12 +131,12 @@ class SeqList():
             for seq in seqs:
                 f.write(seq + "\n")
                 
-    def trimTwoEnds(self, start, end, fixed_length = None):
+    def trimTwoEnds(self, start, end, fixed_length = None, fixed_length_tol = 0):
         trimmed = {}
         sequences = []
         for seq in self.order:
             seq = cast(Sequence, seq)
-            tseq = seq.trimTwoEnds(start, end, fixed_length)
+            tseq = seq.trimTwoEnds(start, end, fixed_length, fixed_length_tol)
             sequences.append(tseq)
             if not tseq is None:
                 if not tseq in trimmed:
@@ -148,6 +153,26 @@ class SeqList():
         for seq in self.order:
             seq = cast(Sequence, seq)
             tseq = seq.trimTwoEndsWithLength(start, fixed_length)
+            if not tseq is None:
+                sequences.append(tseq)
+                if not tseq in trimmed:
+                    trimmed[tseq] = {"Count": 1, "label": self.seqs[seq]["label"]}
+                else:
+                    trimmed[tseq]["Count"] += 1
+        self.seqs = trimmed
+        self.order = sequences
+        return self
+    
+    def trimWithFuzzyPattern(self, start:str, end:str, fixed_length:int, fixed_length_tol = 0, pre_ed_tol = 1, end_ed_tol = 1):
+        header_pattern = f"(?b:({start}){{s<={pre_ed_tol}}})"
+        end_pattern = f"(?b:({end}){{s<={end_ed_tol}}})"
+        middle_pattern = f"([ACGT]{{{fixed_length - fixed_length_tol},{fixed_length + fixed_length_tol}}})"
+        pattern = regex.compile(header_pattern + middle_pattern + end_pattern)
+        trimmed = {}
+        sequences = []
+        for seq in self.order:
+            seq = cast(Sequence, seq)
+            tseq = seq.trimWithFuzzyPattern(pattern)
             if not tseq is None:
                 sequences.append(tseq)
                 if not tseq in trimmed:
@@ -189,6 +214,15 @@ class SeqList():
     
     def getUniqueSeqs(self):
         return list(self.seqs.keys())
+    
+    def getkmerCount(self, kmer:int) -> dict:
+        count = {}
+        items = list(self.seqs.items())
+        for i in range(len(items)):
+            kmers = cast(Sequence, items[i][0]).getkmerCount(kmer)
+            for part in kmers.keys():
+                count[part] = count.get(part, 0) + items[i][1]["Count"] * kmers.get(part, 0)
+        return count
     
     def sortbyCount(self, topk:int = None):
         items = list(self.seqs.items())

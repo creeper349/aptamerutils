@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Aptamer Utils Web</title>
+</head>
+<body>
+    <h1>Aptamer 分类工具</h1>
+    <form method="POST" enctype="multipart/form-data">
+        <label>上传 fastq 文件：</label>
+        <input type="file" name="fastq" required><br><br>
+
+        <label>5' 端剪切序列：</label>
+        <input type="text" name="header" value="GACGAC" required><br><br>
+
+        <label>3' 端剪切序列：</label>
+        <input type="text" name="end" value="GTCGTC" required><br><br>
+
+        <label>固定序列长度：</label>
+        <input type="checkbox" name="fixedLength" id="fixed_length_checkbox" onchange="toggleLengthInputs()" unchecked><br><br>
+
+        <label>期望长度：</label>
+        <input type="text" name="fixedLengthInt" id="expected_length_input" value="30"><br><br>
+
+        <label>允许的长度偏差：</label>
+        <input type="text" name="fixedLengthTol" id="tolerance_input" value="0"><br><br>
+
+        <label>聚类 eps 值：</label>
+        <input type="text" name="eps" value="0.6"><br><br>
+
+        <label>保留前 K 条聚类：</label>
+        <input type="text" name="savetopk" value="1000"><br><br>
+
+        <label>结果显示前 K 条：</label>
+        <input type="text" name="topk" value="50"><br><br>
+
+        <label>Kmer 特征片段长度：</label>
+        <input type="text" name="displaykmerfeature" value="5"><br><br>
+
+        <label>是否显示 Loop：</label>
+        <input type="checkbox" name="showLoop" checked><br><br>
+
+        <label>特征最小频率阈值：</label>
+        <input type="text" name="featureminfrac" value="0.8"><br><br>
+
+        <button type="submit">运行分析</button>
+    </form>
+
+    <script>
+    function toggleLengthInputs() {
+        const checkbox = document.getElementById("fixed_length_checkbox");
+        const lengthInput = document.getElementById("expected_length_input");
+        const toleranceInput = document.getElementById("tolerance_input");
+
+        lengthInput.disabled = !checkbox.checked;
+        toleranceInput.disabled = !checkbox.checked;
+    }
+
+    window.onload = function() {
+        toggleLengthInputs();
+    }
+    </script>
+
+    {% if image_path %}
+        <h2>分析结果：</h2>
+        <iframe src="{{ url_for('static', filename=image_path) }}" width="100%" height="600px"></iframe>
+    {% endif %}
+</body>
+</html>

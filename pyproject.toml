@@ -4,18 +4,21 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aptamerutils"
-version = "0.1.0"
+version = "0.2.0"
 description = "Aptamer sequence analysis utilities"
 authors = [{ name="creeper349", email="1601789895@qq.com" }]
 readme = "README.md"
 license = { text = "MIT" }
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 
 dependencies = [
     "numpy",
     "scikit-learn",
     "matplotlib",
-    "umap-learn"
+    "umap-learn",
+    "viennarna",
+    "hdbscan",
+    "regex"
 ]
 
 [tool.setuptools]
@@ -25,4 +28,4 @@ package-dir = {"" = "src"}
 where = ["src"]
 
 [project.urls]
-Repository = "https://github.com/yourusername/sequtils"
+Repository = "https://github.com/creeper349/aptamerutils"
