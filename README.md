@@ -14,6 +14,8 @@ For more about classes and functions of this package, see notebook files in `.do
 
 This is a figure of aptamer clustering result. `.pdf`, `.png`, `.svg` files are all supported as output. The colored bases are feature fragments of each cluster (family), as the bolded bases are unpaired predicted by Viennarna when a nucleic acid molecule forms its secondary structure.
 
+For more about classes and functions of this package, see notebook files in `.docs/`
+
 ![figure](example/results/save.png)
 
 ## versions
