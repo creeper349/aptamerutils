@@ -15,25 +15,23 @@ def index():
     if request.method == 'POST':
         file = request.files['fastq']
         header = request.form['header']
+        header_tol = int(request.form['header_tol'])
         end = request.form['end']
+        end_tol = int(request.form['end_tol'])
         eps = float(request.form['eps'])
         topk = int(request.form['topk'])
         displaykmerfeature = int(request.form['displaykmerfeature'])
         showLoop = request.form.get('showLoop') == 'on'
         featureminfrac = float(request.form['featureminfrac'])
-        fixed_length_enabled = request.form.get("fixedLength") == "on"
         savetopk = int(request.form.get("savetopk"))
-        if fixed_length_enabled:
-            fixedlength = int(request.form.get("fixedLengthInt"))
-            tolerance = int(request.form.get("fixedLengthTol"))
-        else:
-            fixedlength, tolerance = None, 0
+        fixedlength = int(request.form.get("fixedLengthInt"))
+        tolerance = int(request.form.get("fixedLengthTol"))
 
         filepath = os.path.join(UPLOAD_FOLDER, file.filename)
         file.save(filepath)
 
         seq = SeqList().fromfastq(filepath)
-        seq = seq.trimTwoEnds(header, end, fixed_length = fixedlength, fixed_length_tol = tolerance)
+        seq = seq.trimWithFuzzyPattern(header, end, fixedlength, tolerance, header_tol, end_tol)
         seq = seq.sortbyCount(topk = savetopk)
         clusters = seq.generateDistMap().createPosMap().getCluster(eps=eps)
         seq.getClustersLabeled(clusters)

@@ -13,11 +13,14 @@
         <label>5' 端剪切序列：</label>
         <input type="text" name="header" value="GACGAC" required><br><br>
 
+        <label>5' 端剪切序列匹配容差：</label>
+        <input type="text" name="header_tol" value="1" required><br><br>
+
         <label>3' 端剪切序列：</label>
         <input type="text" name="end" value="GTCGTC" required><br><br>
 
-        <label>固定序列长度：</label>
-        <input type="checkbox" name="fixedLength" id="fixed_length_checkbox" onchange="toggleLengthInputs()" unchecked><br><br>
+        <label>3' 端剪切序列匹配容差：</label>
+        <input type="text" name="end_tol" value="1" required><br><br>
 
         <label>期望长度：</label>
         <input type="text" name="fixedLengthInt" id="expected_length_input" value="30"><br><br>
@@ -45,21 +48,6 @@
 
         <button type="submit">运行分析</button>
     </form>
-
-    <script>
-    function toggleLengthInputs() {
-        const checkbox = document.getElementById("fixed_length_checkbox");
-        const lengthInput = document.getElementById("expected_length_input");
-        const toleranceInput = document.getElementById("tolerance_input");
-
-        lengthInput.disabled = !checkbox.checked;
-        toleranceInput.disabled = !checkbox.checked;
-    }
-
-    window.onload = function() {
-        toggleLengthInputs();
-    }
-    </script>
 
     {% if image_path %}
         <h2>分析结果：</h2>

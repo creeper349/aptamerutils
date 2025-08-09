@@ -70,6 +70,14 @@ class SeqList():
         else:
             self.seqs[seq]["Count"] += 1
         return self
+    
+    def addTwoEnds(self, header = "", end = ""):
+        lst = list(self.seqs.items())
+        newseqlist = SeqList()
+        for item in lst:
+            newseqlist.seqs[Sequence(header + str(item[0]) + end)] = item[1]
+            newseqlist.order += [Sequence(header + str(item[0]) + end)] * item[1]["Count"]
+        return newseqlist
             
     def fromList(self, lst:list[Sequence], label = None):
         for seq in lst:
@@ -224,6 +232,39 @@ class SeqList():
                 count[part] = count.get(part, 0) + items[i][1]["Count"] * kmers.get(part, 0)
         return count
     
+    def getClusterTotalCount(self, cluster_id):
+        count = 0
+        for item in list(self.seqs.items()):
+            if isinstance(item[1]["label"], dict):
+                cluster = item[1]["label"]["cluster"]
+                if cluster == cluster_id:
+                    count += item[1]["Count"]
+            else:
+                raise RuntimeError("Sequence clusters is not defined; Use Seqlist.getClustersLabeled first")
+        return count
+    
+    def getClusterSeqs(self, cluster_id):
+        seqs = SeqList()
+        for item in list(self.seqs.items()):
+            if isinstance(item[1]["label"], dict):
+                cluster = item[1]["label"]["cluster"]
+                if cluster == cluster_id:
+                    seqs.seqs[item[0]] = item[1]
+                    seqs.order += [item[0]] * item[1]["Count"]
+            else:
+                raise RuntimeError("Sequence clusters is not defined; Use Seqlist.getClustersLabeled first")
+        return seqs
+    
+    def getClusterFeature(self, cluster_id, featureminfrac = 0.8, kmer = 5):
+        from ._dist import _kmer_set
+        from ._textrenderer import union_fraction
+        
+        sets = []
+        clusterseqs = self.getClusterSeqs(cluster_id)
+        for seq in clusterseqs:
+            sets.append(_kmer_set(str(seq), kmer))
+        return union_fraction(sets, featureminfrac)
+    
     def sortbyCount(self, topk:int = None):
         items = list(self.seqs.items())
         counts = [item[1]["Count"] for item in items]
@@ -258,9 +299,12 @@ class SeqList():
         self.seqs, self.order = newdict, newlist
         return self
     
-    def drawText(self, filename:str = "save.pdf", displaykmerfeature:int = None, showLoop = False, header = "", end = "", fontsize = 5, featureminfrac = 0.8):
-        fig, ax = plt.subplots()
-        ax = getDisplayClusterFigure(ax, self, displaykmerfeature, showLoop, header, end, fontsize, featureminfrac)
+    def drawText(self, filename:str = "save.pdf", displaykmerfeature:int = None, 
+                 showLoop = False, header = "", end = "", fontsize = 5, 
+                 featureminfrac = 0.8, style:Literal["A", "B"] = "B", 
+                 figuresize = (8, 12), **kwargs):
+        fig, ax = plt.subplots(figsize = figuresize)
+        ax = getDisplayClusterFigure(ax, self, displaykmerfeature, showLoop, header, end, fontsize, featureminfrac, style = style, **kwargs)
         plt.savefig(filename)
         return ax
     
