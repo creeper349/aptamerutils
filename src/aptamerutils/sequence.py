@@ -168,7 +168,7 @@ class Sequence:
         return pattern.match(self.seq)
     
     def trimTwoEnds(self, start, end, fixed_length = None, fixed_length_tol = 0):
-        pattern = r"%s(.*?)%s" % (re.escape(str(start)), re.escape(str(end)))
+        pattern = r"%s([ATCGU]+)%s" % (re.escape(str(start)), re.escape(str(end)))
         match = re.search(pattern, self.seq)
         if match:
             target = match.group(1)
@@ -177,7 +177,7 @@ class Sequence:
         return None
     
     def trimTwoEndsWithLength(self, start, fixed_length):
-        pattern = r"%s(.{%d})" % (re.escape(str(start)), fixed_length)
+        pattern = r"%s([ATCGU]{%d})" % (re.escape(str(start)), fixed_length)
         match = re.search(pattern, self.seq)
         if match:
             return Sequence(match.group(1))

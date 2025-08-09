@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aptamerutils"
-version = "0.2.0"
+version = "0.3.0"
 description = "Aptamer sequence analysis utilities"
 authors = [{ name="creeper349", email="1601789895@qq.com" }]
 readme = "README.md"
