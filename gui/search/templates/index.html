@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Searching Desired Sequences</title>
+</head>
+<body>
+    <h1>序列搜索工具</h1>
+    <form method="POST" enctype="multipart/form-data">
+        <label>上传 fastq 文件：</label>
+        <input type="file" name="fastq" required><br><br>
+
+        <label>是否剪切：</label>
+        <input type="checkbox" name="trim" id="trim_checkbox" onchange="toggleInputs()" unchecked><br><br>
+
+        <label>5' 端剪切序列：</label>
+        <input type="text" name="header" id="header" value="GACGAC" required><br><br>
+
+        <label>5' 端剪切序列匹配容差：</label>
+        <input type="text" name="header_tol" id="headertol" value="1" required><br><br>
+
+        <label>3' 端剪切序列：</label>
+        <input type="text" name="end" id="end" value="GTCGTC" required><br><br>
+
+        <label>3' 端剪切序列匹配容差：</label>
+        <input type="text" name="end_tol" id="endtol" value="1" required><br><br>
+
+        <label>期望长度：</label>
+        <input type="text" name="fixedLengthInt" id="expected_length_input" value="30"><br><br>
+
+        <label>允许的长度偏差：</label>
+        <input type="text" name="fixedLengthTol" id="tolerance_input" value="0"><br><br>
+
+        <label>匹配特征：</label>
+        <input type="text" name="customfeature" value=""><br>
+        <small style="color: gray;">匹配规则：用Find("...")表示要寻找的子序列，用逻辑运算符&(and)、|(or)、~(not)
+            连接不同的Find子序列特征，如Find("ATCGA") & ~Find("AGACC")。
+        </small><br><br>
+
+        <button type="submit">运行分析</button>
+    </form>
+
+    {% if result_file %}
+      <h2>分析结果：</h2>
+      <div style="display: flex; gap: 10px; align-items: flex-start;">
+          <textarea id="result_text" readonly
+              style="width: 100%; height: 240px; font-family: 'Courier New', monospace; font-size: 14px; white-space: pre;"></textarea>
+          <button type="button" id="copy_btn">复制</button>
+      </div>
+      <script>
+        document.addEventListener("DOMContentLoaded", function() {
+          fetch("{{ url_for('static', filename=result_file) }}", { cache: "no-store" })
+            .then(resp => {
+                if (!resp.ok) throw new Error("结果文件读取失败");
+                return resp.text();
+            })
+            .then(text => {
+                document.getElementById("result_text").value = text;
+            })
+            .catch(err => {
+                document.getElementById("result_text").value = "加载结果失败：" + err;
+            });
+
+          document.getElementById("copy_btn").addEventListener("click", function() {
+            const ta = document.getElementById("result_text");
+            ta.select();
+            document.execCommand("copy");
+            this.textContent = "已复制";
+            setTimeout(() => this.textContent = "复制", 1500);
+          });
+        });
+      </script>
+    {% endif %}
+
+    <script>
+      function toggleInputs() {
+          const checkbox = document.getElementById("trim_checkbox");
+          const header = document.getElementById("header");
+          const headertol = document.getElementById("headertol");
+          const end = document.getElementById("end");
+          const endtol = document.getElementById("endtol");
+          const lengthInput = document.getElementById("expected_length_input");
+          const toleranceInput = document.getElementById("tolerance_input");
+
+          const disabled = !checkbox.checked;
+          header.disabled = disabled;
+          headertol.disabled = disabled;
+          end.disabled = disabled;
+          endtol.disabled = disabled;
+          lengthInput.disabled = disabled;
+          toleranceInput.disabled = disabled;
+      }
+
+      document.addEventListener("DOMContentLoaded", function() {
+          toggleInputs();
+      });
+    </script>
+
+</body>
+</html>
