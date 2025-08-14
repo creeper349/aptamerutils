@@ -5,52 +5,52 @@
     <title>Aptamer Utils Web</title>
 </head>
 <body>
-    <h1>Aptamer 分类工具</h1>
+    <h1>Aptamer Clustering Tool:</h1>
     <form method="POST" enctype="multipart/form-data">
-        <label>上传 fastq 文件：</label>
+        <label>Upload fastq file:</label>
         <input type="file" name="fastq" required><br><br>
 
-        <label>5' 端剪切序列：</label>
+        <label>5' trimming sequence:</label>
         <input type="text" name="header" value="GACGAC" required><br><br>
 
-        <label>5' 端剪切序列匹配容差：</label>
+        <label>5' trimming sequence matching error:</label>
         <input type="text" name="header_tol" value="1" required><br><br>
 
-        <label>3' 端剪切序列：</label>
+        <label>3' trimming sequence:</label>
         <input type="text" name="end" value="GTCGTC" required><br><br>
 
-        <label>3' 端剪切序列匹配容差：</label>
+        <label>3' trimming sequence matching error:</label>
         <input type="text" name="end_tol" value="1" required><br><br>
 
-        <label>期望长度：</label>
+        <label>Expected sequence length:</label>
         <input type="text" name="fixedLengthInt" id="expected_length_input" value="30"><br><br>
 
-        <label>允许的长度偏差：</label>
+        <label>Sequence length matching error:</label>
         <input type="text" name="fixedLengthTol" id="tolerance_input" value="0"><br><br>
 
-        <label>聚类 eps 值：</label>
+        <label>Parameter eps for DBSCAN-Clustering:</label>
         <input type="text" name="eps" value="0.6"><br><br>
 
-        <label>保留前 K 条聚类：</label>
+        <label>Use k-most sequences for clustering:</label>
         <input type="text" name="savetopk" value="1000"><br><br>
 
-        <label>结果显示前 K 条：</label>
+        <label>Show k-most sequences in result figure:</label>
         <input type="text" name="topk" value="50"><br><br>
 
-        <label>Kmer 特征片段长度：</label>
+        <label>Length of extracted k-mer feature:</label>
         <input type="text" name="displaykmerfeature" value="5"><br><br>
 
-        <label>是否显示 Loop：</label>
+        <label>Show loops:</label>
         <input type="checkbox" name="showLoop" checked><br><br>
 
-        <label>特征最小频率阈值：</label>
+        <label>Threshold of treating k-mer fragments as feature of a cluster:</label>
         <input type="text" name="featureminfrac" value="0.8"><br><br>
 
-        <button type="submit">运行分析</button>
+        <button type="submit">Run</button>
     </form>
 
     {% if image_path %}
-        <h2>分析结果：</h2>
+        <h2>Analysis results:</h2>
         <iframe src="{{ url_for('static', filename=image_path) }}" width="100%" height="600px"></iframe>
     {% endif %}
 </body>

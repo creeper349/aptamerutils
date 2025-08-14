@@ -5,68 +5,69 @@
     <title>Searching Desired Sequences</title>
 </head>
 <body>
-    <h1>序列搜索工具</h1>
+    <h1>Sequences Search Tools</h1>
     <form method="POST" enctype="multipart/form-data">
-        <label>上传 fastq 文件：</label>
+        <label>Upload fastq file:</label>
         <input type="file" name="fastq" required><br><br>
 
-        <label>是否剪切：</label>
+        <label>Trimming:</label>
         <input type="checkbox" name="trim" id="trim_checkbox" onchange="toggleInputs()" unchecked><br><br>
 
-        <label>5' 端剪切序列：</label>
+        <label>5' trimming sequence:</label>
         <input type="text" name="header" id="header" value="GACGAC" required><br><br>
 
-        <label>5' 端剪切序列匹配容差：</label>
+        <label>5' trimming sequence matching error:</label>
         <input type="text" name="header_tol" id="headertol" value="1" required><br><br>
 
-        <label>3' 端剪切序列：</label>
+        <label>3' trimming sequence:</label>
         <input type="text" name="end" id="end" value="GTCGTC" required><br><br>
 
-        <label>3' 端剪切序列匹配容差：</label>
+        <label>3' trimming sequence matching error:</label>
         <input type="text" name="end_tol" id="endtol" value="1" required><br><br>
 
-        <label>期望长度：</label>
+        <label>Expected sequence length:</label>
         <input type="text" name="fixedLengthInt" id="expected_length_input" value="30"><br><br>
 
-        <label>允许的长度偏差：</label>
+        <label>Sequence length matching error:</label>
         <input type="text" name="fixedLengthTol" id="tolerance_input" value="0"><br><br>
 
-        <label>匹配特征：</label>
+        <label>Search pattern:</label>
         <input type="text" name="customfeature" value=""><br>
-        <small style="color: gray;">匹配规则：用Find("...")表示要寻找的子序列，用逻辑运算符&(and)、|(or)、~(not)
-            连接不同的Find子序列特征，如Find("ATCGA") & ~Find("AGACC")。
+        <small style="color: gray;">Use Find("...") to construct searching feature expressions,
+            different subsequence patterns can be connected with logical operators: "&" for "and",
+            "|" for "or" and "~" for "not", for example, Find("ATCGA") & ~Find("AGACC").
         </small><br><br>
 
-        <button type="submit">运行分析</button>
+        <button type="submit">Run</button>
     </form>
 
     {% if result_file %}
-      <h2>分析结果：</h2>
+      <h2>Analysis results:</h2>
       <div style="display: flex; gap: 10px; align-items: flex-start;">
           <textarea id="result_text" readonly
               style="width: 100%; height: 240px; font-family: 'Courier New', monospace; font-size: 14px; white-space: pre;"></textarea>
-          <button type="button" id="copy_btn">复制</button>
+          <button type="button" id="copy_btn">Copy</button>
       </div>
       <script>
         document.addEventListener("DOMContentLoaded", function() {
           fetch("{{ url_for('static', filename=result_file) }}", { cache: "no-store" })
             .then(resp => {
-                if (!resp.ok) throw new Error("结果文件读取失败");
+                if (!resp.ok) throw new Error("Failed to read result file");
                 return resp.text();
             })
             .then(text => {
                 document.getElementById("result_text").value = text;
             })
             .catch(err => {
-                document.getElementById("result_text").value = "加载结果失败：" + err;
+                document.getElementById("result_text").value = "Failed to load:" + err;
             });
 
           document.getElementById("copy_btn").addEventListener("click", function() {
             const ta = document.getElementById("result_text");
             ta.select();
             document.execCommand("copy");
-            this.textContent = "已复制";
-            setTimeout(() => this.textContent = "复制", 1500);
+            this.textContent = "Copied to clipboard";
+            setTimeout(() => this.textContent = "Copy", 1500);
           });
         });
       </script>
@@ -74,7 +75,7 @@
 
     {% if seq_count is not none %}
         <div style="margin-top: 16px; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;">
-        序列总数: <strong>{{ seq_count }}</strong>
+        Total Sequence Count: <strong>{{ seq_count }}</strong>
         </div>
     {% endif %}
 
