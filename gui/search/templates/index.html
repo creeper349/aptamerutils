@@ -72,6 +72,12 @@
       </script>
     {% endif %}
 
+    {% if seq_count is not none %}
+        <div style="margin-top: 16px; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;">
+        序列总数: <strong>{{ seq_count }}</strong>
+        </div>
+    {% endif %}
+
     <script>
       function toggleInputs() {
           const checkbox = document.getElementById("trim_checkbox");

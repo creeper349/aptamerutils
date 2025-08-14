@@ -32,10 +32,11 @@ def index():
         matchseq = seq.findCustomSeqCombination(eval(pattern))
         result_file = os.path.join(RESULT_FOLDER, f'{os.path.splitext(file.filename)[0]}.txt')
         matchseq.saveLines(result_file)
+        seq_count = len(matchseq)
         
-        return render_template('index.html', result_file = f'results/{os.path.splitext(file.filename)[0]}.txt')
+        return render_template('index.html', result_file = f'results/{os.path.splitext(file.filename)[0]}.txt', seq_count = seq_count)
 
-    return render_template('index.html', result_file=None)
+    return render_template('index.html', result_file=None, seq_count = None)
 
 @app.route('/results/<filename>')
 def result_file(filename):
